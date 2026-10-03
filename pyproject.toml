@@ -1,0 +1,22 @@
+[project]
+name = "ai-agents-illutrated"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "gauravexp261", email = "malik.gaurav26051995@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.4.3",
+    "langchain-ollama>=1.1.0",
+    "openai>=3.23.0",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+ai-agents-illutrated = "ai_agents_illutrated:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
