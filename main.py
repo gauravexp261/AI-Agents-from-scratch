@@ -1,26 +1,30 @@
 from llm import LLM
 from trajectory import Trajectory
-import memory
+from memory.memory import Memory
+from memory.trimingmemory import TrimmingMemory
+from memory.summarizationmemory import SummarizationMemory
 
 class TinyAgent:
     """A minimal, modular, and educational agent framework."""
 
-    def __init__(self,llm:LLM):
+    def __init__(self,llm,memory):
         self.llm = llm
         self.memory = memory  # Chapter 4: Add Memory
         self.tools = None  # Chapter 5: Add Tools
         self.planner = None  # Chapter 6: Add Planning
         self.trajectory = Trajectory()
 
-    def run(self, messages: list[dict]) -> str:
+    def run(self, task:str) -> str:
         """Run the agent on a task."""
-        self.trajectory.initialize(query=messages[-1]["content"])
-        return self._step(messages)
+        self.memory.add("user", task)
+        self.trajectory.initialize(task)
+        return self._step()
 
-    def _step(self,  messages: list[dict]) -> str:
+    def _step(self) -> str:
         """Perform a single step."""
         # Placeholder - will be implemented in later chapters
-        response = self.llm.generate(messages)
+        response = self.llm.generate(self.memory.get_messages())
+        self.memory.add("assistant", response.content)
         self.trajectory.add(response)
         return response.content
 
@@ -34,17 +38,16 @@ class TinyAgent:
 # gemma4:lates
 
 
-messages = [
-    {"role": "system", "content": "You are helpful assistant"},
-    {"role": "user", "content": "What is 2+2 and how many stars are rhere"},
-]
+
 
 if __name__ == "__main__":
-    agent = TinyAgent(llm=LLM(model="gemma4:latest",temperature= 0))
-    response = agent.run(messages)
-    print("ANSWER:")
-    print(response)
-    print("==================")
-    print("==================")
-    print("\nTRAJECTORY:")
-    print(agent.trajectory.runs)
+    memory = SummarizationMemory(LLM(model="gemma4:latest"))
+    agent_with_memory = TinyAgent(LLM(model="gemma4:latest"), memory=memory)
+    response_1 = agent_with_memory.run("Hi! my name is gaurav")
+    response_2 = agent_with_memory.run("how is it going")
+    response_3 = agent_with_memory.run("what is 4-40")
+    response_4 = agent_with_memory.run("what is my name")
+    print(agent_with_memory.memory.get_messages())
+    print()
+    print()
+    print(agent_with_memory.trajectory.runs)
