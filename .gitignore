@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+exp_2.py
+exp.py
